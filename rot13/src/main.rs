@@ -9,9 +9,8 @@ struct Rot13Writer<T>
 where
 	T: Write,
 {
-//	stream: BufWriter<T>,
-//	content: T
-	stream: T
+//	stream: T
+	stream: BufWriter<T>
 }
 
 impl<T> Rot13Writer<T>
@@ -20,11 +19,9 @@ where
 {
 	pub fn new(inner: T) -> Self {
 		
-//		let mut buffer: T;
-		
 		Self {
-//			stream: BufWriter::new(buffer), content: inner
-			stream: inner
+//			stream: inner
+			stream: BufWriter::new(inner)
 		}
 	}
 }
@@ -76,10 +73,17 @@ fn main() {
 	
 	let mut content = Vec::<u8>::default();
 	
-	let mut buff = Rot13Writer::new(&mut content);
-	
-	buff.write(b"Lbh penpxrq zl fhcre qvssvphyg pbqvat punyyratr... pbqr vf ddommNst")
-	    .unwrap();
+	{
+		let mut buff = Rot13Writer::new(&mut content);
+		
+		buff.write(b"Lbh penpxrq zl fhcre qvssvphyg pbqvat punyyratr... pbqr vf ddommNst")
+		    .unwrap();
+		
+		if !buff.flush().is_ok() {
+			
+			println!("Failed to flush buffer");
+		}
+	}
 	
 	println!(
 		"result: {:?}",

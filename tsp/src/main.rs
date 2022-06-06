@@ -65,24 +65,40 @@ fn tsp_serial(nodes: &Vec<Node>) -> Vec<f64> {
 
 fn tsp_hill_climb(nodes: &Vec<Node>) -> Vec<f64> {
 	
+	return tsp_algo(nodes, 0.0);
+}
+
+fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<f64> {
+	
+	return tsp_algo(nodes, 3.0);
+}
+	
+fn tsp_algo(nodes: &Vec<Node>, temperature: f64) -> Vec<f64> {
+	
 	const CONVERGENCE: f64 = 0.005;
-	let min_iter: usize = cmp::max(nodes.len() / 10, 10);
+	let min_iter: usize = cmp::max(nodes.len() / 10, 100);
 	let max_iter: usize = cmp::min(1000 * nodes.len(), 100);
 	
+	let mut temp: f64 = temperature;
 	let mut history = Vec::<f64>::default();
 	let mut order: Vec<usize> = (0..nodes.len()).collect();
 	let mut converged = false;
 	let mut iteration: usize = 0;
 	let mut distance: f64;
 	let mut best: f64 = f64::MAX;
+	let mut verybest: f64 = f64::MAX;
 	let mut _changed: bool;
 	let mut idx1: usize;
 	let mut idx2: usize;
 	let mut shift: usize;
+	let mut variation: f64;
+	let mut p: f64;
+	let mut mfp: f64;
 	
 	while !converged && iteration < max_iter {
 		
-		shift = rand::thread_rng().gen_range(1..nodes.len());
+//		shift = rand::thread_rng().gen_range(1..nodes.len());
+		shift = 1;
 		
 		idx1 = iteration % (nodes.len());
 		idx2 = (idx1 + shift) % (nodes.len());
@@ -93,17 +109,29 @@ fn tsp_hill_climb(nodes: &Vec<Node>) -> Vec<f64> {
 		}
 		
 		distance = measure_distance(nodes, &order);
-		
-		history.push(distance);
 
 		if (iteration >= max_iter - 1) || ((iteration > min_iter) && (((distance - best)/distance).abs() < CONVERGENCE)) {
 			
 			converged = true;
 			
-			history.push(best);
+			history.push(verybest);
 		}
+		
+		// Positive variation means better result
+		variation = best - distance;
+		
+		p = rand::random::<f64>();
+		
+		if temp > 0.0 {
+			
+			mfp = (- variation.abs() / temp).exp();
+		} else {
+			mfp = 0.0;
+		}
+		
+//		println!("exp({} / {}) = {} <-> p = {}", -variation.abs(), temperature, mfp, p);
 
-		if best <= distance {
+		if (variation <= 0.0) && (p > mfp) {
 			
 			// Swap back if fit is worse
 			order.swap(idx1, idx2);
@@ -111,10 +139,16 @@ fn tsp_hill_climb(nodes: &Vec<Node>) -> Vec<f64> {
 			_changed = false;
 			
 		} else {
+			history.push(distance);
 			
 			_changed = true;
 			
 			best = distance;
+			
+			if best < verybest {
+				
+				verybest = best;
+			}
 			
 //			if iteration > 0 {
 //				println!("Swapped {} and {}", idx1, idx2);
@@ -123,15 +157,14 @@ fn tsp_hill_climb(nodes: &Vec<Node>) -> Vec<f64> {
 		
 //		println!("{:4} {:?} : {:.6} (better: {:?})", iteration, order, distance, _changed);
 		
+//		temp /= 1_f64.exp();
+		temp *= 0.95;
+		
 		iteration += 1;
 	}
 	
 	return history;
 }
-
-//fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<f64> {
-//    todo!();
-//}
 
 fn main() {
 	
@@ -141,11 +174,15 @@ fn main() {
 	
 	let se_history = tsp_serial(&nodes);
 	let hc_history = tsp_hill_climb(&nodes);
-//	let sa_history = tsp_simulated_annealing(&nodes);
+	let sa_history = tsp_simulated_annealing(&nodes);
 	
 	println!("   Serial: {:.6}", se_history[0]);
-	println!("Hillclimb: {:.6}", hc_history.last().unwrap());
+	println!("Hill Climbing: {:.6}", hc_history.last().unwrap());
 	println!("{}", plot(hc_history,
+	                    Config::default().with_offset(10).with_height(10).
+	                    with_caption("".to_string())));
+	println!("Simulated Annealing: {:.6}", sa_history.last().unwrap());
+	println!("{}", plot(sa_history,
 	                    Config::default().with_offset(10).with_height(10).
 	                    with_caption("".to_string())));
 }
