@@ -14,6 +14,7 @@ fib(40) = 102334155
 You cracked my super difficult coding challenge... code is qqbzzAfg
 
 ## Traveling Salesman Problem
+```
    Serial: 5.667594
 Hill Climbing: 3.823426
       5.67   ┼╮         
@@ -39,3 +40,4 @@ Simulated Annealing: 3.207438
       3.73   ┤            ╰╯       ╰──╯     ╰──╮╭╯       ╰╯╰╮      
       3.47   ┤                                 ╰╯           ╰╮     
       3.21   ┤                                               ╰────
+```
