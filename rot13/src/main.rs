@@ -44,12 +44,8 @@ where
 			
 				cur += 13;
 				
-				if buf[i] <= b'z' && cur > b'z' {
-					
-					cur -= 26;
-				}
-				
-				if buf[i] <= b'Z' && cur > b'Z' {
+				if (buf[i] <= b'z' && cur > b'z') || 
+				   (buf[i] <= b'Z' && cur > b'Z')  {
 					
 					cur -= 26;
 				}
@@ -63,6 +59,7 @@ where
 	
 	fn flush(&mut self) -> std::io::Result<()> {
 		
+		// This is required only if BufWriter is used
 		self.stream.flush().unwrap();
 		
 		Ok(())
@@ -73,6 +70,7 @@ fn main() {
 	
 	let mut content = Vec::<u8>::default();
 	
+	// This additional closure is need when using BufWriter instead of directly writing to the output.
 	{
 		let mut buff = Rot13Writer::new(&mut content);
 		
@@ -105,6 +103,7 @@ mod tests {
 		
 		let mut content = Vec::<u8>::default();
 		
+		// This additional closure is need when using BufWriter instead of directly writing to the output.
 		{
 			let mut buff = Rot13Writer::new(&mut content);
 			
