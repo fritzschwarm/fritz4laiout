@@ -3,7 +3,7 @@ extern crate rand;
 
 use rasciigraph::plot;
 use rasciigraph::Config;
-use rand::Rng;
+//use rand::Rng;
 use std::cmp;
 
 struct Node {
@@ -75,7 +75,7 @@ fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<f64> {
 	
 fn tsp_algo(nodes: &Vec<Node>, temperature: f64) -> Vec<f64> {
 	
-	const CONVERGENCE: f64 = 0.005;
+	const CONVERGENCE: f64 = 0.001;
 	let min_iter: usize = cmp::max(nodes.len() / 10, 100);
 	let max_iter: usize = cmp::min(1000 * nodes.len(), 100);
 	
@@ -157,7 +157,6 @@ fn tsp_algo(nodes: &Vec<Node>, temperature: f64) -> Vec<f64> {
 		
 //		println!("{:4} {:?} : {:.6} (better: {:?})", iteration, order, distance, _changed);
 		
-//		temp /= 1_f64.exp();
 		temp *= 0.95;
 		
 		iteration += 1;
@@ -177,12 +176,14 @@ fn main() {
 	let sa_history = tsp_simulated_annealing(&nodes);
 	
 	println!("   Serial: {:.6}", se_history[0]);
+	
 	println!("Hill Climbing: {:.6}", hc_history.last().unwrap());
 	println!("{}", plot(hc_history,
-	                    Config::default().with_offset(10).with_height(10).
+	                    Config::default().with_offset(10).with_height(10).with_width(80).
 	                    with_caption("".to_string())));
+	
 	println!("Simulated Annealing: {:.6}", sa_history.last().unwrap());
 	println!("{}", plot(sa_history,
-	                    Config::default().with_offset(10).with_height(10).
+	                    Config::default().with_offset(10).with_height(10).with_width(80).
 	                    with_caption("".to_string())));
 }
