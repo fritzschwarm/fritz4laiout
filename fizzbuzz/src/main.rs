@@ -6,7 +6,12 @@
 /// returns an empty string in any other case
 pub fn fizzbuzz(n: usize) -> String {
 	
-	//! @note The order of match arms matters
+	return format!("{}{}", if n%3==0 {"Fizz"} else {""}, if n%5==0 {"Buzz"} else {""});
+}
+
+pub fn fizzbuzz_alt(n: usize) -> String {
+	
+	//! Note: The order of match arms matters
 	match n {
 		// Or just: n if n % 15 == 0
 		n if (n % 3 == 0) && (n % 5 == 0) => { return "FizzBuzz".to_string(); }
