@@ -3,8 +3,11 @@ Laiout Challenges
 
 ## FizzBuzz
 test tests::divisible_by_3_and_5 ... ok
+
 test tests::divisible_by_5 ... ok
+
 test tests::divisibile_by_3 ... ok
+
 test tests::divisible_by_neither_3_nor_5 ... ok
 
 ## Fibonacci
